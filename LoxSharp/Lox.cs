@@ -1,4 +1,5 @@
-﻿using LoxSharp.AST;
+﻿using LoxSharp.Evaluation;
+using LoxSharp.Exceptions;
 using LoxSharp.Scanning;
 
 namespace LoxSharp;
@@ -6,7 +7,8 @@ namespace LoxSharp;
 public class Lox : IErrorHandler
 {
     public bool HadError = false;
-    
+    public bool HadRuntimeError = false;
+
     public void RunFile(string path)
     {
         // Load the text
@@ -68,15 +70,24 @@ public class Lox : IErrorHandler
         // Start the parse process.
         var expression = parser.Parse();
 
-        if(!HadError)
-        {
-            Debug.Log(new AstPrinter().Print(expression));
-        }
+        // if(!HadError)
+        // {
+        //     Debug.Log(new AstPrinter().Print(expression));
+        // }
+        var interpreter =  new Interpreter(this);
+        interpreter.Interpret(expression);
     }
 
     private void Report(int line, string where, string message)
     {
         Console.Error.WriteLine($"[line {line}] Error {where}: {message}");
         HadError = true;
+    }
+    
+    public void RuntimeError(RuntimeError error)
+    {
+        Debug.LogError(error.Message);
+        Debug.LogError("[line " + error.token.Line + "]");
+        HadRuntimeError = true;
     }
 }

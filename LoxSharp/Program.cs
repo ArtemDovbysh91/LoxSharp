@@ -14,4 +14,13 @@ else
     loxRunner.RunPrompt();
 }
 
-return loxRunner.HadError ? 60 : 0;
+if(loxRunner.HadError)
+{
+    return 60;
+}
+
+if(loxRunner.HadRuntimeError)
+{
+    return 70;
+}
+return 0;
